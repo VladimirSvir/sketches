@@ -1,9 +1,12 @@
 import pygame as pg
 import random
 import math
+import ctypes
+
+user32 = ctypes.windll.user32
 
 
-res = WIDTH, HEIGTH = 1600, 900
+res = WIDTH, HEIGTH = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
 FPS = 60
 COL_STAR = 2000
 
@@ -11,9 +14,9 @@ vec2, vec3 = pg.math.Vector2, pg.math.Vector3
 CENTER = vec2(WIDTH // 2, HEIGTH // 2)
 COLORS = 'white grey blue cyan skyblue purple magenta'.split()
 # Z_DISTANCE = 40
-Z_DISTANCE = 140
+Z_DISTANCE = 190
 # ALPHA = 120
-ALPHA = 50
+ALPHA = 90
 
 
 class Star:
@@ -25,9 +28,9 @@ class Star:
         self.screen_pos = vec2(0, 0)
         self.size = 10
 
-    def get_pos3d(self, scale_pos=35):
+    def get_pos3d(self, scale_pos=50):
         angel = random.uniform(0, 2 * math.pi)
-        radius = random.randrange(HEIGTH // 7, HEIGTH) * scale_pos
+        radius = random.randrange(HEIGTH // 5, HEIGTH) * scale_pos
         x = radius * math.sin(angel)
         y = radius * math.cos(angel)
         return vec3(x, y, Z_DISTANCE)
@@ -38,6 +41,8 @@ class Star:
 
         self.screen_pos = vec2(self.pos3d.x, self.pos3d.y) / self.pos3d.z + CENTER
         self.size = (Z_DISTANCE - self.pos3d.z) / (0.5 * self.pos3d.z)
+
+        self.pos3d.xy = self.pos3d.xy.rotate(0.02)
 
     def draw(self):
         pg.draw.circle(self.screen, self.color, self.screen_pos, self.size)
@@ -61,6 +66,7 @@ class App:
         self.starfield = Starfield(self)
 
     def run(self):
+        pg.mouse.set_visible(False)
         while True:
             # self.screen.fill('black')
             self.screen.blit(self.alpha_surface, (0, 0))
